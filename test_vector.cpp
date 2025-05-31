@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <algorithm> // For std::sort, std::find
+#include <algorithm>
 #include "vector.hpp"
 
 TEST(VectorTest, DefaultConstructor) {
