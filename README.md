@@ -46,6 +46,36 @@
 - `push_back(T&&)` — добавляет перемещённый элемент в конец.
 - `pop_back()` — удаляет последний элемент.
 
+### Итераторы
+Класс `Vector` реализует собственный итератор `Vector<T>::Iterator`, совместимый с требованиями `std::random_access_iterator`. Это позволяет:
+
+- Перебирать элементы с помощью обычного цикла:
+  ```cpp
+  for (auto it = vec.begin(); it != vec.end(); ++it) {
+      std::cout << *it << " ";
+  }
+  ```
+
+- Использовать диапазонный цикл (range-based for):
+  ```cpp
+  for (const auto& val : vec) {
+      std::cout << val << " ";
+  }
+  ```
+
+- Применять стандартные алгоритмы STL, такие как `std::sort`, `std::find` и др.:
+  ```cpp
+  std::sort(vec.begin(), vec.end());
+  auto it = std::find(vec.begin(), vec.end(), 42);
+  ```
+
+Итератор поддерживает:
+- инкремент/декремент (++, --),
+- арифметику сдвига (+=, -=, +, -),
+- разыменование (`*`, `->`),
+- доступ по индексу (`it[n]`),
+- сравнение (`==`, `!=`, `<`, `>`, `<=`, `>=`).
+
 ## Зависимости
 
 - CMake >= 3.10
@@ -56,31 +86,41 @@
 
 1. Клонируйте репозиторий:
 
-   ```
+   ```bash
    git clone <URL-репозитория>
    cd <имя-папки-проекта>
    ```
+
 2. Создайте директорию для сборки и перейдите в неё:
-```
-    mkdir build
-    cd build
-```
-3.  Запустите CMake и сборку:
-```
-    cmake ..
-    make
-```
+
+   ```bash
+   mkdir build
+   cd build
+   ```
+
+3. Запустите CMake и сборку:
+
+   ```bash
+   cmake ..
+   make
+   ```
+
 4. Запустите тесты:
+
+   ```bash
+   ./test_vector
+   ```
+
+### Пример вывода:
 ```
-    ./test_vector
+[==========] Running 14 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 14 tests from VectorTest
+[ RUN      ] VectorTest.DefaultConstructor
+[       OK ] VectorTest.DefaultConstructor (0 ms)
+...
+[----------] 14 tests from VectorTest (X ms total)
+
+[==========] 14 tests from 1 test suite ran. (X ms total)
+[  PASSED  ] 14 tests.
 ```
-Пример вывода
-
-Программа может выводить в консоль отладочную информацию, такую как вызов конструктора перемещения или лог о перераспределении памяти:
-
-push back with lvalue called
-
-Reallocation happened at size: 1
-New capacity is now: 2
-
-

@@ -1,9 +1,9 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
-
 #include <cstdint>
 #include <initializer_list>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <stdexcept>
 
@@ -12,17 +12,13 @@ class Vector {
  private:
   size_t m_size;
   size_t m_capacity;
-  T* m_begin;
-  T* m_end;
+  T *m_begin;
+  T *m_end;
 
  public:
-  Vector()
-      : m_size{0},
-        m_capacity{0},
-        m_begin{nullptr},
-        m_end{nullptr} {}
+  Vector() : m_size{0}, m_capacity{0}, m_begin{nullptr}, m_end{nullptr} {}
 
-  Vector(size_t n, const T& value = T()) : m_size{n}, m_capacity{n} {
+  Vector(size_t n, const T &value = T()) : m_size{n}, m_capacity{n} {
     m_begin = new T[m_size];
     for (size_t i = 0; i < m_size; ++i) {
       m_begin[i] = value;
@@ -34,15 +30,15 @@ class Vector {
       : m_size{lst.size()}, m_capacity{lst.size()} {
     m_begin = new T[m_size];
     size_t i = 0;
-    for (auto& elem : lst) {
+    for (auto &elem : lst) {
       m_begin[i++] = elem;
     }
     m_end = m_begin + m_size;
   }
 
-  Vector(const Vector<T>& vec)
+  Vector(const Vector<T> &vec)
       : m_size{vec.m_size}, m_capacity{vec.m_capacity} {
-    std::cout << "Copy ctor called\n";
+    //std::cout << "Copy ctor called\n";
     m_begin = new T[m_size];
     for (size_t i = 0; i < m_size; ++i) {
       m_begin[i] = vec.m_begin[i];
@@ -50,19 +46,19 @@ class Vector {
     m_end = m_begin + m_size;
   }
 
-  Vector(Vector<T>&& vec) noexcept
+  Vector(Vector<T> &&vec) noexcept
       : m_size{vec.m_size},
         m_capacity{vec.m_capacity},
         m_begin{vec.m_begin},
         m_end{vec.m_end} {
-    std::cout << "Move ctor called\n";
+    //std::cout << "Move ctor called\n";
     vec.m_begin = nullptr;
     vec.m_end = nullptr;
     vec.m_size = 0;
     vec.m_capacity = 0;
   }
 
-  Vector<T>& operator=(const Vector& vec) {
+  Vector<T> &operator=(const Vector &vec) {
     if (this == &vec) return *this;
     delete[] m_begin;
     m_size = vec.m_size;
@@ -75,7 +71,8 @@ class Vector {
     return *this;
   }
 
-  Vector<T>& operator=(Vector&& vec) noexcept {
+  Vector<T> &operator=(Vector &&vec) noexcept {
+    if (this == &vec) return *this;
     delete[] m_begin;
     m_begin = vec.m_begin;
     m_end = vec.m_end;
@@ -88,50 +85,46 @@ class Vector {
     return *this;
   }
 
-  T& operator[](size_t pos) {
-    return m_begin[pos];
-  }
+  T &operator[](size_t pos) { return m_begin[pos]; }
 
-  const T& operator[](size_t pos) const {
-    return m_begin[pos];
-  }
+  const T &operator[](size_t pos) const { return m_begin[pos]; }
 
-  T& at(size_t pos) {
+  T &at(size_t pos) {
     if (pos >= m_size) {
       throw std::out_of_range("Index out of bounds");
     }
     return m_begin[pos];
   }
 
-  const T& at(size_t pos) const {
+  const T &at(size_t pos) const {
     if (pos >= m_size) {
       throw std::out_of_range("Index out of bounds");
     }
     return m_begin[pos];
   }
 
-  T& front() {
+  T &front() {
     if (m_size == 0) throw std::out_of_range("Vector is empty");
     return m_begin[0];
   }
 
-  const T& front() const {
+  const T &front() const {
     if (m_size == 0) throw std::out_of_range("Vector is empty");
     return m_begin[0];
   }
 
-  T& back() {
+  T &back() {
     if (m_size == 0) throw std::out_of_range("Vector is empty");
     return *(m_end - 1);
   }
 
-  const T& back() const {
+  const T &back() const {
     if (m_size == 0) throw std::out_of_range("Vector is empty");
     return m_begin[m_size - 1];
   }
 
-  T* data() { return m_begin; }
-  const T* data() const { return m_begin; }
+  T *data() { return m_begin; }
+  const T *data() const { return m_begin; }
   bool empty() { return m_size == 0; }
 
   void clear() {
@@ -146,7 +139,7 @@ class Vector {
     return std::numeric_limits<size_t>::max() / sizeof(T);
   }
 
-  void resize(size_t count, const T& val = T()) {
+  void resize(size_t count, const T &val = T()) {
     if (count == m_size) {
       return;
     }
@@ -166,7 +159,7 @@ class Vector {
 
   void reserve(size_t n) {
     if (n <= m_capacity) return;
-    T* auxiliary = new T[n];
+    T *auxiliary = new T[n];
     for (size_t i = 0; i < m_size; ++i) {
       auxiliary[i] = m_begin[i];
     }
@@ -177,7 +170,7 @@ class Vector {
   }
 
   template <typename... Args>
-  void emplace_back(Args&&... args) {
+  void emplace_back(Args &&... args) {
     if (m_size == m_capacity) {
       size_t new_capacity = (m_capacity == 0) ? 1 : 2 * m_capacity;
       reserve(new_capacity);
@@ -187,24 +180,24 @@ class Vector {
     m_end = m_begin + m_size;
   }
 
-  void push_back(const T& value) {
-    std::cout << "\npush back with lvalue called \n";
+  void push_back(const T &value) {
+    //std::cout << "\npush back with lvalue called \n";
     if (m_size == m_capacity) {
-      std::cout << "\nReallocation happened at size: " << m_size << '\n';
+      //std::cout << "\nReallocation happened at size: " << m_size << '\n';
       size_t new_capacity = (m_capacity == 0) ? 1 : 2 * m_capacity;
-      std::cout << "New capacity is now: " << new_capacity << '\n';
+      //std::cout << "New capacity is now: " << new_capacity << '\n';
       reserve(new_capacity);
     }
     m_begin[m_size++] = value;
     m_end = m_begin + m_size;
   }
 
-  void push_back(T&& value) {
-    std::cout << "\npush back with rvalue called \n";
+  void push_back(T &&value) {
+    //std::cout << "\npush back with rvalue called \n";
     if (m_size == m_capacity) {
-      std::cout << "\nReallocation happened at size: " << m_size << '\n';
+      //std::cout << "\nReallocation happened at size: " << m_size << '\n';
       size_t new_capacity = (m_capacity == 0) ? 1 : 2 * m_capacity;
-      std::cout << "New capacity is now: " << new_capacity << '\n';
+      //std::cout << "New capacity is now: " << new_capacity << '\n';
       reserve(new_capacity);
     }
     m_begin[m_size++] = std::move(value);
@@ -223,18 +216,86 @@ class Vector {
   size_t size() const { return m_size; }
   size_t capacity() const { return m_capacity; }
 
-  ~Vector() { delete[] m_begin; }
+  ~Vector() {
+    clear();
+    delete[] m_begin;
+  }
 
   template <typename U>
-  friend std::ostream& operator<<(std::ostream& out, const Vector<U>& vec);
+  friend std::ostream &operator<<(std::ostream &out, const Vector<U> &vec);
+
+  class Iterator {
+    T *ptr;
+
+   public:
+    using iterator_category = std::random_access_iterator_tag;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = T *;
+    using reference = T &;
+
+    Iterator(T *p = nullptr) : ptr(p) {}
+
+    T &operator*() const { return *ptr; }
+
+    T *operator->() const { return ptr; }
+
+    Iterator operator++(int) {
+      Iterator tmp = *this;
+      ++(*this);
+      return tmp;
+    }
+
+    Iterator &operator++() {
+      ++ptr;
+      return *this;
+    }
+
+    Iterator operator--(int) {
+      Iterator tmp = *this;
+      --(*this);
+      return tmp;
+    }
+
+    Iterator operator--() {
+      --ptr;
+      return *this;
+    }
+    Iterator operator+=(difference_type n) {
+      ptr += n;
+      return *this;
+    }
+    Iterator operator-=(difference_type n) {
+      ptr -= n;
+      return *this;
+    }
+    reference operator[](difference_type n) { return *(ptr + n); }
+    Iterator operator+(difference_type n) const { return Iterator(ptr + n); }
+    Iterator operator-(difference_type n) const { return Iterator(ptr - n); }
+    difference_type operator-(const Iterator &other) const {
+      return ptr - other.ptr;
+    }
+    bool operator==(const Iterator &other) const { return ptr == other.ptr; }
+    bool operator!=(const Iterator &other) const { return ptr != other.ptr; }
+
+    bool operator>(const Iterator &other) const { return ptr > other.ptr; }
+    bool operator<(const Iterator &other) const { return ptr < other.ptr; }
+    bool operator>=(const Iterator &other) const { return ptr >= other.ptr; }
+    bool operator<=(const Iterator &other) const { return ptr <= other.ptr; }
+  };
+
+  Iterator begin() { return Iterator(m_begin); }
+  Iterator end() { return Iterator(m_end); }
+
+  const Iterator begin() const { return Iterator(m_begin); }
+  const Iterator end() const { return Iterator(m_end); }
 };
 
 template <typename T>
-std::ostream& operator<<(std::ostream& out, const Vector<T>& vec) {
+std::ostream &operator<<(std::ostream &out, const Vector<T> &vec) {
   for (size_t i = 0; i < vec.m_size; ++i) {
     out << vec.m_begin[i] << ' ';
   }
   return out;
 }
-
 #endif
